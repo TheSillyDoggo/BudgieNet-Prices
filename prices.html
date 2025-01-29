@@ -77,7 +77,7 @@
 
                 var possibleJsons = [];
 
-                var itemSearch = document.getElementById("item-name-input").value.toLowerCase();
+                var itemSearch = document.getElementById("item-name-input").value.toLowerCase().replace(" ", "_");
                 var sellerSearch = document.getElementById("seller-name-input").value.toLowerCase();
                 var buy = document.getElementById("buy").checked;
                 var sell = document.getElementById("sell").checked;
