@@ -22,18 +22,23 @@
                 <p id="last-updated" style="font-weight: bold;"></p>
             </div>
 
-            <div style="display: flex; gap: 5px;">
+            <div style="display: flex; gap: 5px">
                 <input type="text" id="item-name-input" placeholder="Item Name"></input>
                 <input type="text" id="seller-name-input" placeholder="Seller Name"></input>
+                <input type="text" id="shop-id-input" placeholder="Shop ID"></input>
                 <input type="checkbox" id="buy" checked="true">Buy</input>
                 <input type="checkbox" id="sell" checked="true">Sell</input>
                 <input type="checkbox" id="oos" checked="false">Out of Stock</input>
+                <input type="checkbox" id="shop-estimate" checked="true">Shop Estimates</input>
                 <select id="sort-mode">
                     <option value="price-low-to-high">Price (Low to High)</option>
                     <option value="price-high-to-low">Price (High to Low)</option>
                     <option value="stock-low-to-high">Stock (Low to High)</option>
                     <option value="stock-high-to-low">Stock (High to Low)</option>
                 </select>
+                <div style="height: 0px;">
+                    <p style="position: relative; bottom: 14px; left: 10px;">Some shop locations are just estimates. This is indicated with a "*" at the end of the Shop ID</p>
+                </div>
             </div>
 
             <div style="display: flex; gap: 5px; height: 40px;">
@@ -52,6 +57,9 @@
                 </div>
                 <div style="width: 100px; height:40px;">
                     <p>Price</p>
+                </div>
+                <div style="width: 100px; height:40px;">
+                    <p>Shop</p>
                 </div>
                 <div style="width: 200px; height:40px;">
                     <p>Position</p>
@@ -79,9 +87,11 @@
 
                 var itemSearch = document.getElementById("item-name-input").value.toLowerCase();
                 var sellerSearch = document.getElementById("seller-name-input").value.toLowerCase();
+                var shopSearch = document.getElementById("shop-id-input").value.toLowerCase();
                 var buy = document.getElementById("buy").checked;
                 var sell = document.getElementById("sell").checked;
                 var outofstock = document.getElementById("oos").checked;
+                var estimates = document.getElementById("shop-estimate").checked;
 
                 jsonData.data.forEach(element => {
                     if (element["type"] == "Buy" && !buy)
@@ -93,11 +103,18 @@
                     if (element["type"] == "Out of Stock" && !outofstock)
                         return;
 
+                    if (element["estimate"] && !estimates)
+                        return;
+
                     if (!element["item-name"].toLowerCase().includes(itemSearch))
                         return;
 
                     if (!element["seller"].toLowerCase().includes(sellerSearch))
                         return;
+
+                    if (shopSearch != "")
+                        if (element["shop-id"] != shopSearch)
+                            return;
 
                     possibleJsons.push(element);
                 });
@@ -135,6 +152,9 @@
                         </div>
                         <div style="width: 100px; height:40px;">
                             <p>$${element["price"]}</p>
+                        </div>
+                        <div style="width: 100px; height:40px;">
+                            <p>${element["shop-id"]}${element["estimate"] ? "*" : ""}</p>
                         </div>
                         <div style="width: 200px; height:40px;">
                             <p>xyz(${element["x"]}, ${element["y"]}, ${element["z"]})</p>
@@ -182,9 +202,11 @@
 
             document.getElementById("item-name-input").addEventListener("input", onEventUpdateList);
             document.getElementById("seller-name-input").addEventListener("input", onEventUpdateList);
+            document.getElementById("shop-id-input").addEventListener("input", onEventUpdateList);
             document.getElementById("buy").addEventListener("change", onEventUpdateList);
             document.getElementById("sell").addEventListener("change", onEventUpdateList);
             document.getElementById("oos").addEventListener("change", onEventUpdateList);
+            document.getElementById("shop-estimate").addEventListener("change", onEventUpdateList);
             document.getElementById("sort-mode").addEventListener("change", onEventUpdateList);
 
             fetch("https://raw.githubusercontent.com/TheSillyDoggo/BudgieNet-Prices/refs/heads/main/listings.json")
